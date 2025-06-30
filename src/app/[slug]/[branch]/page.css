@@ -1,0 +1,280 @@
+div > p:first-child {
+	margin-top: 0px !important;
+}
+
+hr {
+	margin: 2vw 0 2vw 0;
+}
+
+p {
+	margin: 3vw auto auto auto !important;
+	font-size: 18px;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+h2 {
+	font-size: 20px !important;
+	font-weight: bold !important;
+	margin: 3vw auto auto auto !important;
+}
+
+h3 {
+	font-size: 18px !important;
+	font-weight: bold !important;
+	margin: 3vw auto auto auto !important;
+}
+
+figure {
+	margin: 2vw auto 2vw auto !important;
+	width: 600px !important;
+	height: auto !important;
+}
+
+figcaption {
+	text-align: center !important;
+	margin-top: 1vw !important;
+	text-decoration: underline !important;
+	font-style: italic !important;
+}
+
+ul {
+	list-style-type: disc;
+	margin-left: 1rem;
+	margin-top: 1rem;
+}
+
+a {
+	text-decoration: underline;
+	font-size: 18px;
+}
+
+a:hover {
+	color: blueviolet;
+}
+
+.image-gallery__list {
+	margin-top: 4vw;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 1vw;
+}
+
+.image-gallery__list > a {
+	flex: 1 1 100%;
+}
+
+.image-gallery__list > a > img {
+	width: 100%;
+	object-fit: contain;
+}
+
+div[data-embed-type='imageGallery'] {
+	margin-top: 4vw;
+	display: none;
+}
+
+.image-gallery__header {
+	font-weight: bold;
+}
+
+.image-gallery__main {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 2rem;
+	flex: 1 1 200px;
+}
+
+.image-gallery__item > img {
+	object-fit: cover;
+	width: 300px;
+	height: auto;
+}
+
+.image-gallery__item--show-more {
+	display: none;
+}
+
+div[data-embed-type='toc'] {
+	margin: 5vw;
+}
+
+div[data-embed-type='toc'] > span {
+	font-size: 20px;
+}
+
+#toc_list {
+	margin-top: 20px;
+}
+
+#toc_list > li {
+	list-style-type: none;
+}
+
+#toc_list > li > a {
+	text-decoration: none;
+}
+
+#toc_list ul {
+	padding-left: 1.5rem; /* or use margin-left */
+}
+
+div[data-embed-type='tweet'] {
+	margin: 5vw;
+}
+
+/* 
+	buylink__container
+*/
+
+.buylink__container {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 1vw;
+	margin: 1vw;
+}
+
+.buylink__item {
+	/* padding: 1rem; */
+	background-color: var(--terBg);
+	border-radius: 10px;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+	max-width: 380px;
+	color: #a8e6cf !important;
+	/* flex: 1 1 300px; */
+}
+
+.buylink__text a {
+	text-decoration: none;
+}
+
+.buylink__deck a {
+	/* text-decoration: underline; */
+	font-size: 0.9rem !important;
+}
+
+.buylink__item:hover {
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+
+.header_buy_link {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 2vw;
+	margin-bottom: 1vw;
+	padding: 1rem;
+}
+
+.buylink__links {
+	border-top: 2px solid white;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.5rem;
+}
+
+.buylink__links a {
+	background-color: var(--bg);
+	padding: 0.5rem 0.8rem 0.5rem 0.8rem;
+	font-size: 1rem;
+	text-decoration: none;
+	border-radius: 10px;
+}
+
+.buylink__links a:hover {
+	color: white;
+	background-color: var(--secBg);
+}
+
+.buylink__wrapper {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	justify-content: center;
+}
+
+.buylink__extra {
+	cursor: pointer;
+}
+
+.buylink__links > a:not(:first-of-type) {
+	display: none;
+}
+
+.buylink-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 1vw;
+}
+
+.item-title {
+	text-align: center;
+}
+
+.item-title a {
+	font-size: 1.5rem;
+}
+
+.item-deck {
+	margin: 0 !important;
+	text-align: center;
+}
+
+.item-deck a {
+	text-decoration: none;
+}
+
+.item-deck a:hover {
+	color: white;
+}
+
+.image-container > img {
+	margin: 2vw auto 2vw auto;
+}
+
+.item-buttons {
+	display: flex;
+	flex-direction: row;
+	gap: 1vw;
+	justify-content: flex-start;
+	align-items: center;
+	margin: 2vw;
+}
+
+.item-buttons div a {
+	background-color: var(--secBg);
+	padding: 1rem 1.5rem 1rem 1.5rem;
+	font-size: 1rem;
+	text-decoration: none;
+	border-radius: 10px;
+	text-decoration: none;
+}
+
+.item-buttons div a:hover {
+	color: white;
+	background-color: var(--terBg);
+}
+
+.buylink__extra_links {
+	display: flex;
+}
+
+.buylink__extra_links a {
+	text-align: center;
+}
+
+.main-image {
+	max-width: 500px;
+}

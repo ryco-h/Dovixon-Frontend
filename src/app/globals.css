@@ -1,26 +1,86 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* ◕‿‿◕ */
+
+.react-tooltip {
+	z-index: 99;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--bg: #333845;
+	--secBg: #5e6473;
+	--terBg: #515768;
+	--textColor: white;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Scrollbar track */
+*::-webkit-scrollbar {
+	width: 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Scrollbar background */
+*::-webkit-scrollbar-track {
+	background: var(--terBg); /* matches container background */
 }
 
+/* Scrollbar thumb */
+*::-webkit-scrollbar-thumb {
+	background-color: var(--bg); /* or any color you want for the bar */
+	border-radius: 6px;
+	border: 4px solid transparent; /* Creates spacing by matching track color */
+	background-clip: content-box;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+		'Lucida Sans', Arial, sans-serif;
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	width: 100%;
+	/* overflow-x: hidden; */
+	background-color: var(--bg) !important;
 }
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.main-container {
+	min-height: 100vh;
+	background-color: (var(--bg));
+	color: var(--textColor);
+	display: flex;
+	flex-direction: row;
+	overflow: visible; /* this must stay visible */
+	width: 100%;
+}
+
+.wrapper {
+	/* padding-left: 100px;
+	padding-right: 100px; */
+	margin: 0 auto 0 auto;
+	flex: 1;
+	min-width: 0;
+}
+
+.sidebar-pro {
+	position: sticky;
+	top: 0;
+	height: 100vh; /* make sidebar full viewport height */
+	overflow: visible; /* also important */
+	align-self: flex-start; /* sometimes needed in flex containers */
+}
+
+/* Media screen format
+
+  @media screen and (max-witdh: ####px) {
+    .class {
+    }
+  } 
+*/

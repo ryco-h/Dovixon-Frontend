@@ -1,0 +1,24 @@
+.container {
+	display: flex;
+	flex-direction: row;
+	/* overflow-y: scroll; */
+	padding-left: 5rem;
+	padding-right: 5rem;
+}
+
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 3vw;
+	width: 100%;
+}
+
+.header {
+	min-width: 800px;
+	display: flex;
+	background-color: var(--secBg);
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+	margin: 20px;
+	padding: 20px;
+	border-radius: 10px;
+}

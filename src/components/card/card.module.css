@@ -1,0 +1,65 @@
+.container {
+	width: 300px;
+	flex: 0 0 auto; /* 💡 prevents card from growing or shrinking */
+	position: relative;
+	z-index: 1;
+	padding: 1vw;
+}
+
+.container:hover {
+	background-color: var(--terBg);
+	cursor: pointer;
+}
+
+.imageCover {
+	position: relative;
+	height: auto;
+	display: flex;
+	justify-content: center;
+}
+
+.containerLong {
+	width: 100%;
+	position: relative;
+	z-index: 1;
+	overflow-x: hidden;
+}
+
+.cardLong {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 3rem;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	align-items: flex-start;
+	flex: 1 1 300px;
+}
+
+.title {
+	font-weight: bold;
+	font-size: 22px;
+}
+
+.description {
+	font-size: 18px;
+}
+
+.readMore {
+	cursor: pointer;
+	border: 1px solid rgba(255, 255, 255, 0.447);
+	border-radius: 10px;
+	padding: 5 10 5 10;
+	background-color: var(--secBg);
+	z-index: 9999;
+	color: var(--textColor);
+}
+
+.readMore:hover {
+	background-color: #262f46;
+	/* background-color: #908a80; */
+}

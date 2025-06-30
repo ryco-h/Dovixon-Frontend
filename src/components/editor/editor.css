@@ -1,0 +1,18 @@
+.MuiTiptap-FieldContainer-notchedOutline {
+	border: 2px solid var(--bg) !important;
+}
+
+.override {
+	background-color: #fff !important;
+}
+
+.override-field {
+	min-height: 300px;
+	padding: 2rem !important;
+	background-color: #ffffff50 !important;
+}
+
+.is-editor-empty::before {
+	color: white !important;
+	opacity: 0.8;
+}

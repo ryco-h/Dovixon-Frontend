@@ -1,0 +1,207 @@
+.container {
+	width: 100%;
+}
+
+.wrapper {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	overflow: hidden;
+}
+
+.header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.centerHeader {
+	position: sticky;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 5rem;
+	top: 0;
+	z-index: 10;
+	background-color: var(--bg);
+	padding: 1rem;
+}
+
+.menu {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	border-radius: 50%;
+	cursor: pointer;
+	padding: 15px;
+	width: 60px;
+	height: 60px;
+	text-align: center;
+}
+
+.menu:hover {
+	background-color: var(--secBg);
+}
+
+.arrow {
+	font-size: 2rem;
+	border-radius: 50%;
+	cursor: pointer;
+	padding: 10px;
+	width: 40px;
+	height: 40px;
+	text-align: center;
+}
+
+.arrow:hover {
+	background-color: var(--secBg);
+}
+
+.book {
+	font-size: 1.5rem;
+	text-transform: capitalize;
+}
+
+.content {
+	scroll-behavior: smooth;
+	padding-left: 2rem;
+	padding-right: 2rem;
+	color: #ffffffd6;
+	overflow-y: auto;
+	flex: 1;
+	position: relative;
+	width: 100%;
+}
+
+@media (min-width: 576px) {
+	.content {
+		padding-left: 3rem;
+		padding-right: 3rem;
+	}
+}
+
+@media (min-width: 768px) {
+	.content {
+		padding-left: 4rem;
+		padding-right: 4rem;
+	}
+}
+
+@media (min-width: 992px) {
+	.content {
+		padding-left: 8rem;
+		padding-right: 8rem;
+	}
+}
+
+@media (min-width: 1200px) {
+	.content {
+		padding-left: 18rem;
+		padding-right: 18rem;
+	}
+}
+
+.verse {
+	display: inline;
+	margin-right: 0.75rem;
+	cursor: pointer;
+}
+
+.number {
+	font-weight: bold;
+	padding: 0rem 0.5rem 0.5rem 0.5rem;
+	color: white;
+	display: inline-flex;
+	gap: 0.5rem;
+	vertical-align: top;
+	font-size: 1rem;
+}
+
+.number:hover {
+	background-color: var(--secBg);
+}
+
+.word {
+	display: inline;
+	font-size: 1.2rem;
+	line-height: 2.3rem;
+}
+
+.selectedVerse {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 0.5rem;
+	font-weight: bold;
+	text-transform: capitalize;
+	font-size: 1.1rem;
+}
+
+.tools {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 0.5rem;
+}
+
+.tool {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 0.3rem;
+	transition: background 0.2s;
+	padding: 0.5rem 1rem 0.5rem 1rem;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.tool:hover {
+	background: var(--bg);
+}
+
+.toolIcon {
+	width: 18px;
+	height: 18px;
+}
+
+.drawerContainer {
+	display: flex;
+	flex-direction: column;
+	overflow-y: hidden;
+}
+
+.chapterNavigation {
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+}
+
+.closeDrawer {
+	text-align: center;
+	background-color: var(--terBg);
+	border-bottom: 2px solid white;
+	color: white;
+	font-size: 1.2rem;
+	padding: 0.5rem;
+	cursor: pointer;
+	position: sticky;
+	top: 0;
+}
+
+.chapter {
+	color: white;
+	padding: 1rem;
+	text-align: center;
+	cursor: pointer;
+}
+
+.chapter:hover {
+	background-color: var(--bg);
+}
