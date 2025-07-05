@@ -29,8 +29,6 @@
 }
 
 .arrow {
-	right: 0;
-	top: 50px;
 	position: absolute;
 	transform: translateX(50%);
 	border: 1px solid rgba(255, 255, 255, 0.447);

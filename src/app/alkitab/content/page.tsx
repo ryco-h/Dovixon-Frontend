@@ -4,7 +4,6 @@ import { VerseInterface } from '@/types/types';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
-import Parser from 'rss-parser';
 
 type RSSItem = {
 	title: string;
@@ -118,19 +117,4 @@ export default function AlkitabContent() {
 	}, []);
 
 	return <div>AlkitabContent</div>;
-}
-
-async function FetchChristianityFeed() {
-	const parser = new Parser<{}, RSSItem>();
-
-	const feed = await parser.parseURL('https://www.christianity.com/rss/');
-
-	return feed.items.map((item) => ({
-		title: item.title,
-		link: item.link,
-		pubDate: item.pubDate,
-		description: item.contentSnippet || '',
-		image: item.enclosure?.url || '',
-		author: item.creator || 'Unknown',
-	}));
 }

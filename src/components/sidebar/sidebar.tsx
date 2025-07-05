@@ -6,6 +6,10 @@ import Image from 'next/image';
 import { Sidebar as SidePro, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { handleSignIn, handleSignOut } from '../auth-components';
 import { useSession } from 'next-auth/react';
+import { useMediaQuery } from '@mui/material';
+
+import { Fab, Action } from 'react-tiny-fab';
+import 'react-tiny-fab/dist/styles.css';
 
 const Menus = [
 	{
@@ -38,12 +42,22 @@ export default function Sidebar() {
 		setCollapsed(!isCollapsed);
 	};
 
+	const isSmallScreen = useMediaQuery('(max-width:1000px)');
+
 	return (
 		<div className={styles.container}>
-			<div className={styles.arrow} onClick={() => expandBase()}>
-				<Image
-					width={22}
-					height={22}
+			<div
+				style={{
+					right: isSmallScreen ? '-15px' : '0px',
+					top: isSmallScreen ? '70px' : '60px',
+					padding: '.7rem',
+					width: '40px',
+					height: '40px',
+				}}
+				className={styles.arrow}
+				onClick={() => expandBase()}
+			>
+				<img
 					alt="right"
 					src={isCollapsed ? '/right.png' : '/back.png'}
 				/>
@@ -52,7 +66,7 @@ export default function Sidebar() {
 			<SidePro
 				collapsed={isCollapsed}
 				backgroundColor="#515768"
-				collapsedWidth="120px"
+				collapsedWidth={isSmallScreen ? '0' : '120px'}
 				style={{
 					minHeight: '100vh',
 					overflow: 'visible',

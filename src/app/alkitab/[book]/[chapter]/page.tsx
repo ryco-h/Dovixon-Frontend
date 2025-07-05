@@ -19,6 +19,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { styled } from '@mui/material/styles';
 import NoteDialogContent from './components/noteDialogContent';
+import AutoScrollDrawer from '@/components/drawer/autoscroll.drawer';
+import { scroller, Element, Events, scrollSpy, Link } from 'react-scroll';
+import { useMediaQuery } from '@mui/material';
 
 const drawerWidth = 120;
 
@@ -46,9 +49,10 @@ export default function Chapter({
 }: {
 	params: Promise<{ book: string; chapter: number }>;
 }) {
+	const isSmallScreen = useMediaQuery('(max-width:1000px)');
+
 	const containerRef = useRef(null);
 	const containerPersonalDataRef = useRef(null);
-	const containerCreateNoteRef = useRef(null);
 
 	const [isLoading, setLoading] = useState(false);
 	const { data: session } = useSession();
@@ -57,6 +61,11 @@ export default function Chapter({
 	const [isMuiDrawerOpen, setMuiDrawer] = useState(false);
 	const toggleMuiDrawer = () => {
 		setMuiDrawer((prev) => !prev);
+	};
+
+	const [autoScrollOpen, setAutoScrollOpen] = useState(false);
+	const toggleAutoScrollDrawer = () => {
+		setAutoScrollOpen((prev) => !prev);
 	};
 
 	const navigate = useRouter();
@@ -427,6 +436,121 @@ export default function Chapter({
 		}
 	};
 
+	const autoScrollContainerRef = useRef<HTMLDivElement>(null);
+	const animationRef = useRef<number | null>(null);
+	const userInterruptedRef = useRef(false);
+	const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	const generateSpeedLevels = () => {
+		const min = 0.05;
+		const max = 0.2;
+		const levels = 10;
+
+		return Array.from({ length: levels }, (_, i) => {
+			const t = i / (levels - 1); // normalized 0..1
+			const eased = Math.pow(t, 1.5); // easing curve
+			const speed = min + (max - min) * eased;
+			return Number(speed.toFixed(3));
+		});
+	};
+
+	const speedLevels = generateSpeedLevels().map((speed, i) => ({
+		label: `x${i + 1}`,
+		value: speed,
+	}));
+	const [speedIndex, setSpeedIndex] = useState(2);
+	const speed = speedLevels[speedIndex].value;
+	const speedLabel = speedLevels[speedIndex].label;
+	const speedRef = useRef(speed);
+	const scrollAccumulatorRef = useRef(0);
+
+	const handleSpeed = (control: 'faster' | 'slower') => {
+		setSpeedIndex((prev) =>
+			control === 'faster'
+				? Math.min(prev + 1, speedLevels.length - 1)
+				: Math.max(prev - 1, 0)
+		);
+	};
+
+	// Keep speedRef in sync with state
+	useEffect(() => {
+		speedRef.current = speed;
+	}, [speed]);
+
+	const scrollStep = () => {
+		const el = autoScrollContainerRef.current;
+		if (!el || !autoScrollOpen || userInterruptedRef.current) return;
+
+		const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+		if (remaining > 0) {
+			scrollAccumulatorRef.current += speedRef.current;
+
+			const scrollAmount = Math.floor(scrollAccumulatorRef.current);
+			if (scrollAmount >= 1) {
+				el.scrollTop += scrollAmount;
+				scrollAccumulatorRef.current -= scrollAmount;
+			}
+
+			animationRef.current = requestAnimationFrame(scrollStep);
+		}
+	};
+	const startAutoScroll = () => {
+		if (animationRef.current) cancelAnimationFrame(animationRef.current);
+		animationRef.current = requestAnimationFrame(scrollStep);
+	};
+
+	const stopAutoScroll = () => {
+		if (animationRef.current) {
+			cancelAnimationFrame(animationRef.current);
+			animationRef.current = null;
+		}
+	};
+
+	useEffect(() => {
+		const el = autoScrollContainerRef.current;
+		if (!el) return;
+
+		const handleUserInteraction = () => {
+			userInterruptedRef.current = true;
+			stopAutoScroll();
+
+			if (resumeTimeoutRef.current)
+				clearTimeout(resumeTimeoutRef.current);
+
+			// Wait 100ms after user interaction stops to resume
+			resumeTimeoutRef.current = setTimeout(() => {
+				userInterruptedRef.current = false;
+				if (autoScrollOpen) {
+					startAutoScroll();
+				}
+			}, 100);
+		};
+
+		el.addEventListener('wheel', handleUserInteraction, { passive: true });
+		el.addEventListener('touchstart', handleUserInteraction, {
+			passive: true,
+		});
+		el.addEventListener('mousedown', handleUserInteraction);
+
+		return () => {
+			el.removeEventListener('wheel', handleUserInteraction);
+			el.removeEventListener('touchstart', handleUserInteraction);
+			el.removeEventListener('mousedown', handleUserInteraction);
+			if (resumeTimeoutRef.current)
+				clearTimeout(resumeTimeoutRef.current);
+			stopAutoScroll();
+		};
+	}, [autoScrollOpen]);
+
+	// Start auto scroll when `autoScrollOpen` is toggled on
+	useEffect(() => {
+		if (autoScrollOpen && !userInterruptedRef.current) {
+			startAutoScroll();
+		} else {
+			stopAutoScroll();
+		}
+	}, [autoScrollOpen]);
+
 	if (isLoading) return <Spinner message="Mohon tunggu" />;
 	if (!filteredBook) return <Spinner message="Memuat kitab" />;
 
@@ -434,93 +558,257 @@ export default function Chapter({
 		<div className={styles.container} id="alkitab-container">
 			<div className={styles.wrapper} ref={containerRef}>
 				<div className={styles.header}>
-					<div
-						className={styles.menu}
-						onClick={handleModal}
-						style={{
-							marginLeft: '5vw',
-							marginRight: '5vw',
-						}}
-						id="searchBible"
-					>
-						<img src="/search.png" alt="search" />
-					</div>
-					<Tooltip
-						style={{ fontSize: '14px' }}
-						anchorSelect="#searchBible"
-						clickable
-					>
-						Cari Kitab
-					</Tooltip>
+					{isSmallScreen ? (
+						<div className={styles.navigationHeaderSmallScreen}>
+							<div
+								className={styles.centerHeader}
+								style={{ padding: 0 }}
+							>
+								<div
+									className={styles.arrow}
+									onClick={() => {
+										nextOrPrevBook('previous');
+									}}
+								>
+									<img src="/previous.png" alt="previous" />
+								</div>
+								<div className={styles.book}>
+									{decodeURIComponent(book)} {chapter}
+								</div>
+								<div
+									className={styles.arrow}
+									onClick={() => nextOrPrevBook('next')}
+								>
+									<img src="/next.png" alt="next" />
+								</div>
+							</div>
 
-					<div className={styles.centerHeader}>
-						<div
-							className={styles.arrow}
-							onClick={() => {
-								nextOrPrevBook('previous');
-							}}
-						>
-							<img src="/previous.png" alt="previous" />
-						</div>
-						<div className={styles.book}>
-							{decodeURIComponent(book)} {chapter}
-						</div>
-						<div
-							className={styles.arrow}
-							onClick={() => nextOrPrevBook('next')}
-						>
-							<img src="/next.png" alt="next" />
-						</div>
-					</div>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+								}}
+							>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'row',
+										gap: '1rem',
+										marginLeft: '5vw',
+									}}
+								>
+									<div
+										className={styles.menuSmallScreen}
+										id="autoScroll"
+										onClick={toggleAutoScrollDrawer}
+									>
+										{autoScrollOpen ? (
+											<img
+												src={'/pause-button.png'}
+												width={30}
+											/>
+										) : (
+											<img
+												src={'/play-button.png'}
+												width={30}
+											/>
+										)}
+									</div>
+									<Tooltip
+										style={{ fontSize: '14px' }}
+										anchorSelect="#autoScroll"
+										clickable
+									>
+										Auto Scroll
+									</Tooltip>
 
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'row',
-							marginLeft: '5vw',
-							marginRight: '5vw',
-							gap: '1rem',
-						}}
-					>
-						<div
-							id="navigateChapter"
-							className={styles.menu}
-							onClick={toggleMuiDrawer}
-						>
-							<img src="/bible-opened.png" alt="bible" />
-						</div>
-						<Tooltip
-							style={{
-								fontSize: '14px',
-								zIndex: 99,
-							}}
-							anchorSelect="#navigateChapter"
-							clickable
-						>
-							Pilih Pasal
-						</Tooltip>
+									<div
+										className={styles.menuSmallScreen}
+										onClick={handleModal}
+										id="searchBible"
+									>
+										<img src="/search.png" alt="search" />
+									</div>
+									<Tooltip
+										style={{ fontSize: '14px' }}
+										anchorSelect="#searchBible"
+										clickable
+									>
+										Cari Kitab
+									</Tooltip>
 
-						<div
-							style={{
-								display: session?.mongoDb.id ? 'block' : 'none',
-							}}
-							id="personalData"
-							className={styles.menu}
-							onClick={handleModalPersonalData}
-						>
-							<img src="/user-book.png" alt="user-book" />
+									<div
+										id="navigateChapter"
+										className={styles.menuSmallScreen}
+										onClick={toggleMuiDrawer}
+									>
+										<img
+											src="/bible-opened.png"
+											alt="bible"
+										/>
+									</div>
+									<Tooltip
+										style={{
+											fontSize: '14px',
+											zIndex: 99,
+										}}
+										anchorSelect="#navigateChapter"
+										clickable
+									>
+										Pilih Pasal
+									</Tooltip>
+
+									<div
+										style={{
+											display: session?.mongoDb.id
+												? 'block'
+												: 'none',
+										}}
+										id="personalData"
+										className={styles.menuSmallScreen}
+										onClick={handleModalPersonalData}
+									>
+										<img
+											src="/user-book.png"
+											alt="user-book"
+										/>
+									</div>
+									<Tooltip
+										style={{ fontSize: '14px' }}
+										anchorSelect="#personalData"
+										clickable
+									>
+										Lihat data pribadi
+									</Tooltip>
+								</div>
+							</div>
 						</div>
-						<Tooltip
-							style={{ fontSize: '14px' }}
-							anchorSelect="#personalData"
-							clickable
-						>
-							Lihat data pribadi
-						</Tooltip>
-					</div>
+					) : (
+						<div className={styles.navigationHeader}>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									gap: '1rem',
+									marginLeft: '5vw',
+								}}
+							>
+								<div
+									className={styles.menu}
+									id="autoScroll"
+									onClick={toggleAutoScrollDrawer}
+								>
+									{autoScrollOpen ? (
+										<img
+											src={'/pause-button.png'}
+											width={30}
+										/>
+									) : (
+										<img
+											src={'/play-button.png'}
+											width={30}
+										/>
+									)}
+								</div>
+								<Tooltip
+									style={{ fontSize: '14px' }}
+									anchorSelect="#autoScroll"
+									clickable
+								>
+									Auto Scroll
+								</Tooltip>
+
+								<div
+									className={styles.menu}
+									onClick={handleModal}
+									id="searchBible"
+								>
+									<img src="/search.png" alt="search" />
+								</div>
+								<Tooltip
+									style={{ fontSize: '14px' }}
+									anchorSelect="#searchBible"
+									clickable
+								>
+									Cari Kitab
+								</Tooltip>
+							</div>
+
+							<div className={styles.centerHeader}>
+								<div
+									className={styles.arrow}
+									onClick={() => {
+										nextOrPrevBook('previous');
+									}}
+								>
+									<img src="/previous.png" alt="previous" />
+								</div>
+								<div className={styles.book}>
+									{decodeURIComponent(book)} {chapter}
+								</div>
+								<div
+									className={styles.arrow}
+									onClick={() => nextOrPrevBook('next')}
+								>
+									<img src="/next.png" alt="next" />
+								</div>
+							</div>
+
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									marginLeft: '5vw',
+									marginRight: '5vw',
+									gap: '1rem',
+								}}
+							>
+								<div
+									id="navigateChapter"
+									className={styles.menu}
+									onClick={toggleMuiDrawer}
+								>
+									<img src="/bible-opened.png" alt="bible" />
+								</div>
+								<Tooltip
+									style={{
+										fontSize: '14px',
+										zIndex: 99,
+									}}
+									anchorSelect="#navigateChapter"
+									clickable
+								>
+									Pilih Pasal
+								</Tooltip>
+
+								<div
+									style={{
+										display: session?.mongoDb.id
+											? 'block'
+											: 'none',
+									}}
+									id="personalData"
+									className={styles.menu}
+									onClick={handleModalPersonalData}
+								>
+									<img src="/user-book.png" alt="user-book" />
+								</div>
+								<Tooltip
+									style={{ fontSize: '14px' }}
+									anchorSelect="#personalData"
+									clickable
+								>
+									Lihat data pribadi
+								</Tooltip>
+							</div>
+						</div>
+					)}
 				</div>
 
-				<div className={`${styles.content} content-alkitab`}>
+				<div
+					className={`${styles.content} content-alkitab`}
+					ref={autoScrollContainerRef}
+				>
 					{filteredBook.map((verse, index) => (
 						<span
 							key={verse.id || 'verse' + index}
@@ -662,6 +950,24 @@ export default function Chapter({
 					) : null}
 				</VerseDrawer>
 
+				<AutoScrollDrawer open={autoScrollOpen}>
+					<div
+						className={styles.autoScrollButton}
+						id="faster"
+						onClick={() => handleSpeed('faster')}
+					>
+						<img src={'/fast-forward.png'} width={20} />
+					</div>
+					<div
+						className={styles.autoScrollButton}
+						id="slower"
+						onClick={() => handleSpeed('slower')}
+					>
+						<img src={'/backward.png'} width={20} />
+					</div>
+					<div className={styles.autoScrollSpeed}>{speedLabel}</div>
+				</AutoScrollDrawer>
+
 				<Drawer
 					sx={{
 						width: drawerWidth,
@@ -726,12 +1032,15 @@ export default function Chapter({
 					disableEnforceFocus
 					onClose={handleModal}
 					style={{ position: 'absolute' }}
-					slots={{
-						backdrop: Backdrop,
-					}}
 					closeAfterTransition
 					slotProps={{
+						root: {
+							style: {
+								zIndex: 99999,
+							},
+						},
 						backdrop: {
+							style: { zIndex: 99 },
 							timeout: 500,
 							sx: {
 								position: 'absolute',
@@ -739,7 +1048,7 @@ export default function Chapter({
 								left: 0,
 								width: '100%',
 								height: '100%',
-								backgroundColor: 'rgba(0, 0, 0, 0.4)',
+								backgroundColor: 'transparent',
 								zIndex: '10 !important',
 							},
 						},
@@ -751,7 +1060,8 @@ export default function Chapter({
 							top: '50%',
 							left: '50%',
 							transform: 'translate(-50%, -50%)',
-							width: 'max-content',
+							width: isSmallScreen ? '100%' : 'max-content',
+							height: isSmallScreen ? '100%' : 'max-content',
 							backgroundColor: 'var(--terBg)',
 							zIndex: '99',
 							borderRadius: '10px',
@@ -772,19 +1082,20 @@ export default function Chapter({
 					disablePortal
 					disableEnforceFocus
 					onClose={handleModalPersonalData}
-					style={{ position: 'absolute' }}
+					style={{ position: 'absolute', width: 'inherit' }}
 					slots={{
 						backdrop: Backdrop,
 					}}
 					closeAfterTransition
 					slotProps={{
+						root: { style: { width: '100%' } },
 						backdrop: {
 							timeout: 500,
 							sx: {
 								position: 'absolute',
 								top: 0,
 								left: 0,
-								width: '100%',
+								width: 'inherit',
 								height: '100%',
 								backgroundColor: 'rgba(0, 0, 0, 0.4)',
 								zIndex: '10 !important',
@@ -797,7 +1108,7 @@ export default function Chapter({
 							position: 'absolute', // Avoid full screen
 							top: '50%',
 							left: '50%',
-							width: '100%',
+							width: 'inherit',
 							height: '100%',
 							transform: 'translate(-50%, -50%)',
 							backgroundColor: 'var(--terBg)',
